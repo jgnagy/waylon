@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
-require_relative "lib/waylon/version"
+module Waylon
+  # Update this to match the desired Waylon::Core::VERSION to release
+  VERSION = "0.1.5"
+end
 
 Gem::Specification.new do |spec|
   spec.name          = "waylon"
@@ -27,7 +30,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "waylon-core", "~> 0.1"
+  spec.add_dependency "waylon-core", Waylon::VERSION
 
   spec.add_development_dependency "bundler", "~> 2.3"
   spec.add_development_dependency "rake", "~> 13.0"

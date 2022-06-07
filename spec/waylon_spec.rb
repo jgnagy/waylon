@@ -2,6 +2,6 @@
 
 RSpec.describe Waylon do
   it "has a version number" do
-    expect(Waylon::VERSION).not_to be nil
+    expect(Waylon::Core::VERSION).not_to be nil
   end
 end
