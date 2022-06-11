@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "waylon/core"
+
+logger = Logger.new($stdout)
+logger.level = Logger::INFO
+action = ARGV[0]
+
+case action
+when "worker"
+  logger.info "Starting Worker..."
+  ENV["INTERVAL"] ||= "0.5"
+  ENV["QUEUE"] ||= "actions"
+  exec "bundle exec rake resque:work"
+when "web"
+  logger.info "Starting Web..."
+  exec "bundle exec puma"
+else
+  logger.fatal "Unknown action: #{action}"
+  exit 1
+end

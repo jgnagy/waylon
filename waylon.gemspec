@@ -2,7 +2,7 @@
 
 module Waylon
   # Update this to match the desired Waylon::Core::VERSION to release
-  VERSION = "0.1.5"
+  VERSION = "0.1.7"
 end
 
 Gem::Specification.new do |spec|
@@ -30,10 +30,10 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "waylon-core", Waylon::VERSION
+  spec.add_dependency "rake", "~> 13.0"
+  spec.add_dependency "waylon-core"
 
   spec.add_development_dependency "bundler", "~> 2.3"
-  spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency "rspec", "~> 3.10"
   spec.add_development_dependency "rubocop", "~> 1.23"
   spec.add_development_dependency "rubocop-rake", "~> 0.6"

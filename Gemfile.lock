@@ -1,8 +1,9 @@
 PATH
   remote: .
   specs:
-    waylon (0.1.5)
-      waylon-core (= 0.1.5)
+    waylon (0.1.7)
+      rake (~> 13.0)
+      waylon-core
 
 GEM
   remote: https://rubygems.org/
