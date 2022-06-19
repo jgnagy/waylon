@@ -11,7 +11,7 @@ case action
 when "worker"
   logger.info "Starting Worker..."
   ENV["INTERVAL"] ||= "0.5"
-  ENV["QUEUE"] ||= "actions"
+  ENV["QUEUE"] ||= "senses,skills"
   exec "bundle exec rake resque:work"
 when "web"
   logger.info "Starting Web..."

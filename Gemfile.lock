@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    waylon (0.1.8)
+    waylon (0.1.9)
       rake (~> 13.0)
       waylon-core
 
@@ -114,7 +114,7 @@ GEM
       tilt (~> 2.0)
     tilt (2.0.10)
     unicode-display_width (2.1.0)
-    waylon-core (0.1.8)
+    waylon-core (0.1.9)
       addressable (~> 2.8)
       faraday (~> 1.8)
       i18n (~> 1.8)
