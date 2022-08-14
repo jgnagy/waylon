@@ -7,7 +7,177 @@ logger = Logger.new($stdout)
 logger.level = Logger::INFO
 action = ARGV[0]
 
+def validate_project_name(name)
+  name.downcase =~ /^[a-z][a-z0-9_]+$/
+end
+
+def rubocop_template
+  <<~TEMPLATE
+    AllCops:
+      TargetRubyVersion: 3.1
+      NewCops: enable
+
+    Style/StringLiterals:
+      Enabled: true
+      EnforcedStyle: double_quotes
+
+    Style/StringLiteralsInInterpolation:
+      Enabled: true
+      EnforcedStyle: double_quotes
+
+    Layout/LineLength:
+      Max: 120
+  TEMPLATE
+end
+
+def ruby_version_template
+  "3.1.2\n"
+end
+
+def dockerfile_template
+  <<~TEMPLATE
+    FROM ruby:3.1
+
+    RUN mkdir -p /app
+
+    COPY config.ru /app/
+    COPY Gemfile.lock /app/
+    COPY plugins.rb /app/
+
+    RUN apt update && apt upgrade -y && apt install -y curl libsodium-dev
+    RUN useradd waylon -d /app -M -c "Waylon Bot User"
+
+    USER waylon
+    WORKDIR /app
+    RUN gem install waylon
+
+    ENTRYPOINT ["waylon"]
+  TEMPLATE
+end
+
+def gemfile_template
+  <<~TEMPLATE
+    # frozen_string_literal: true
+
+    source "https://rubygems.org"
+
+    require_relative "plugins"
+    gem "waylon"
+
+    Plugins.plugins.each_key do |gem_name|
+      gem gem_name
+    end
+  TEMPLATE
+end
+
+def rakefile_template
+  <<~TEMPLATE
+    # frozen_string_literal: true
+
+    require "resque/tasks"
+    require "waylon"
+
+    task "resque:setup" do
+      require_relative "plugins"
+
+      Waylon::Config.instance.load_env
+
+      Plugins.plugins.each_value do |plugin|
+        require plugin
+      end
+      Resque.redis = ENV.fetch("REDIS", "localhost:6379")
+      Resque.logger = Waylon::Logger.logger
+    end
+  TEMPLATE
+end
+
+def config_ru_template
+  <<~TEMPLATE
+    # frozen_string_literal: true
+
+    require_relative "plugins"
+
+    require "waylon"
+    require "waylon/services/ping"
+
+    Plugins.plugins.each_value do |plugin|
+      require plugin
+    end
+
+    use Rack::ShowExceptions
+
+    Waylon::Config.instance.load_env
+
+    services = {
+      "/ping" => Waylon::Services::Ping.new
+    }
+    run Rack::URLMap.new(
+      services.merge(Waylon::WebhookRegistry.instance.to_hash)
+    )
+  TEMPLATE
+end
+
+def plugins_rb_template
+  <<~TEMPLATE
+    # frozen_string_literal: true
+
+    # Used to help package up the plugins you'd like to load for Waylon
+    module Plugins
+      # Should return a Hash like:
+      #  { "waylon-plugin-gem" => "waylon/plugin/gem" }
+      #
+      # Where "waylon-plugin-gem" is the name of the gem to install and
+      # "waylon/plugin/gem" is what you `require` to use it
+
+      def self.plugins
+        {
+          # Choose a Sense plugin to send messages to your bot
+          #  Read more about this plugin here: https://github.com/jgnagy/waylon-slack
+          "waylon-slack" => "waylon/slack",
+
+          # Add some Skill plugins to let your bot do things
+          #  Read more about this plugin here: https://github.com/jgnagy/waylon-dice
+          "waylon-dice" => "waylon/dice"
+        }
+      end
+    end
+  TEMPLATE
+end
+
+def template_mapping
+  {
+    config_ru_template: "config.rb",
+    dockerfile_template: "Dockerfile",
+    gemfile_template: "Gemfile",
+    plugins_rb_template: "plugins.rb",
+    rakefile_template: "Rakefile",
+    rubocop_template: ".rubocop.yml",
+    ruby_version_template: ".ruby-version"
+  }
+end
+
 case action
+when "init"
+  project_name = ARGV[1]
+  unless project_name
+    logger.fatal "Missing Project Name for new bot!"
+    exit 1
+  end
+
+  unless validate_project_name(project_name)
+    logger.fatal "Invalid Project Name: #{project_name}"
+    exit 2
+  end
+
+  logger.info "Initializing new Waylon bot project '#{project_name}'..."
+  system("git init #{project_name}")
+  Dir.chdir(project_name) do
+    template_mapping.each do |func, file|
+      logger.info "Rendering #{File.expand_path(File.join(project_name, file))}"
+      File.write(file, send(func))
+    end
+  end
+  logger.info "Done!"
 when "worker"
   logger.info "Starting Worker..."
   ENV["INTERVAL"] ||= "0.5"

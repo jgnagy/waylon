@@ -32,9 +32,23 @@ This is all while staying familiar to users of Lita. The goal is to make it simp
 
 Many of these features would be difficult to port to existing frameworks.
 
-## Installation
+## Getting Started
 
-Add this line to your application's Gemfile:
+### Creating Your Own Bot
+
+To create a new bot using the Waylon bot framework, you can install the `waylon` gem:
+
+    $ gem install waylon
+
+Then you can use these Waylon executable to create the basics:
+
+    $ waylon init mybot
+
+This creates a directory in your current working directory called `mybot` and populates it with the files needed to get started.
+
+### Other Custom Ruby Projects
+
+For something custom, add this line to your application's Gemfile:
 
 ```ruby
 gem 'waylon'
@@ -43,10 +57,6 @@ gem 'waylon'
 And then execute:
 
     $ bundle install
-
-Or install it yourself as:
-
-    $ gem install waylon
 
 ## Contributing
 
