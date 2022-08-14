@@ -46,6 +46,8 @@ Then you can use these Waylon executable to create the basics:
 
 This creates a directory in your current working directory called `mybot` and populates it with the files needed to get started.
 
+From there, edit the `plugins.rb` file and add some plugins. Check out [this list](https://github.com/search?q=waylon-*+language%3ARuby+user%3Ajgnagy+language%3ARuby+language%3ARuby&type=Repositories&ref=advsearch&l=Ruby&l=Ruby) to see some options.
+
 ### Other Custom Ruby Projects
 
 For something custom, add this line to your application's Gemfile:
