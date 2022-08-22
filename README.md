@@ -52,7 +52,7 @@ From there, edit the `plugins.rb` file and add some plugins. Check out [this lis
 
 Assuming you used `waylon init` from above, you'll have a `Dockerfile` in your repo ready to go. In most cases, you just need to use `docker build -t waylon .` to build an image that can be used in a container environment (such as Kubernetes). You'll likely need to push this to a registry. Waylon and its open-source plugins should never cause sensitive information to be embedded within your image, but if you're using proprietary plugins, you'll want to avoid pushing your built image to a public registry.
 
-For examples on how to deploy your Waylon image to Kubernetes, see the [`helm` example](examples/deploying/helm/) or the [pure Kubernetes example](examples/deploying/k8s/).
+For examples on how to deploy your Waylon image to Kubernetes, see the [`helm` example](examples/deploying/helm/waylon/) or the [pure Kubernetes example](examples/deploying/k8s/).
 
 ### Other Custom Ruby Projects
 

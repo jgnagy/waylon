@@ -46,10 +46,10 @@ $ kubectl -n some-namespace apply -f /tmp/waylon.yaml
 | `web.deployment.cpuLimit` | `250m` | How much CPU can Redis use? |
 | `web.deployment.memoryLimit` | `256Mi` | How much memory can Redis use? |
 | `web.ingress.enabled` | `true` | Should Waylon have an Ingress for its web component? |
-| `web.ingress.class` | `nginx` | What Ingress class will be use for `kubernetes.io/ingress.class`? |
+| `web.ingress.class` | `nginx` | What [Ingress class](https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-class) will be use for `kubernetes.io/ingress.class`? |
 | `web.ingress.hostname` | _none_ | What hostname will the Web component use (also used for TLS) |
 | `web.ingress.tls.enabled` | `true` | Should the Ingress use TLS (HTTPS)? |
-| `web.ingress.tls.issuer` | `letsencrypt` | What is the name of the Issuer/ClusterIssuer that will be used for provisioning TLS secrets? |
+| `web.ingress.tls.issuer` | `letsencrypt` | What is the name of the [Issuer/ClusterIssuer](https://cert-manager.io/docs/concepts/issuer/) that will be used for provisioning TLS secrets? |
 | `web.ingress.tls.issuerClass` | `ClusterIssuer` | Is the TLS issuer a `ClusterIssuer` or an `Issuer`? You can usually ignore this setting. |
 | `web.service.port` | `80` | The port that the Service listens on |
 | `web.service.type` | `ClusterIP` | The Service type |
