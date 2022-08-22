@@ -1,0 +1,50 @@
+common:
+  strictSecurity: true
+  waylonImage: MISSING
+
+redis:
+  enabled: true
+  hostAndPort: redis:6379
+  image: redis:6-alpine
+  imagePullPolicy: Always
+  command:
+  - "redis-server"
+  - "--appendonly yes"
+  cpuLimit: 200m
+  memoryLimit: 512Mi
+  storage:
+    capacity: 1Gi
+    class: longhorn
+
+web:
+  deployment:
+    imagePullPolicy: IfNotPresent
+    logLevel: DEBUG
+    # Rollout settings
+    maxSurge: 2
+    maxUnavailable: 0
+    replicas: 1
+    cpuLimit: 250m
+    memoryLimit: 256Mi
+  ingress:
+    enabled: true
+    class: nginx
+    hostname: MISSING
+    tls:
+      enabled: true
+      issuer: letsencrypt
+      issuerClass: ClusterIssuer
+  service:
+    port: 80
+    type: ClusterIP
+
+worker:
+  deployment:
+    imagePullPolicy: IfNotPresent
+    logLevel: DEBUG
+    # Rollout settings
+    maxSurge: 2
+    maxUnavailable: 0
+    replicas: 2
+    cpuLimit: 500m
+    memoryLimit: 768Mi

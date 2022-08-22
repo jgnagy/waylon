@@ -1,0 +1,19 @@
+{{- if and .Values.redis.enabled .Values.redis.storage.hostPath }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-data-pv
+  labels:
+    type: local
+    app.kubernetes.io/name: redis-data-pv
+    app.kubernetes.io/component: redis-data-pv
+    {{- include "waylon.commonLabels" . | nindent 4 }}
+spec:
+  storageClassName: manual
+  capacity:
+    storage: {{ .Values.redis.storage.capacity }}
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: {{ .Values.redis.storage.hostPath }}
+{{- end -}}

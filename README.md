@@ -48,6 +48,12 @@ This creates a directory in your current working directory called `mybot` and po
 
 From there, edit the `plugins.rb` file and add some plugins. Check out [this list](https://github.com/search?q=waylon-*+language%3ARuby+user%3Ajgnagy+language%3ARuby+language%3ARuby&type=Repositories&ref=advsearch&l=Ruby&l=Ruby) to see some options.
 
+### Building a Docker Image
+
+Assuming you used `waylon init` from above, you'll have a `Dockerfile` in your repo ready to go. In most cases, you just need to use `docker build -t waylon .` to build an image that can be used in a container environment (such as Kubernetes). You'll likely need to push this to a registry. Waylon and its open-source plugins should never cause sensitive information to be embedded within your image, but if you're using proprietary plugins, you'll want to avoid pushing your built image to a public registry.
+
+For examples on how to deploy your Waylon image to Kubernetes, see the [`helm` example](examples/deploying/helm/) or the [pure Kubernetes example](examples/deploying/k8s/).
+
 ### Other Custom Ruby Projects
 
 For something custom, add this line to your application's Gemfile:

@@ -1,0 +1,48 @@
+{{- if .Values.web.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web
+  labels:
+    app.kubernetes.io/name: web
+    app.kubernetes.io/component: ingress
+    {{- include "waylon.commonLabels" . | nindent 4 }}
+    {{- with .Values.web.ingress.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    kubernetes.io/ingress.class: {{ .Values.web.ingress.class }}
+    nginx.ingress.kubernetes.io/preserve-host: "true"
+    {{- if .Values.web.ingress.tls.enabled }}
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    {{- if eq .Values.web.ingress.tls.issuer "letsencrypt" }}
+    {{- if eq .Values.web.ingress.tls.issuerClass "ClusterIssuer" }}
+    cert-manager.io/cluster-issuer: letsencrypt
+    {{- else }}
+    cert-manager.io/issuer: letsencrypt
+    {{- end }}
+    cert-manager.io/acme-challenge-type: http01
+    {{- end }}
+    {{- end }}
+    {{- with .Values.web.ingress.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  rules:
+  - host: {{ .Values.web.ingress.hostname }}
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: waylon
+            port:
+              name: waylon
+  {{- if .Values.web.ingress.tls.enabled }}
+  tls:
+  - hosts:
+    - {{ .Values.web.ingress.hostname }}
+    secretName: web-ingress-tls
+  {{- end }}
+{{- end -}}

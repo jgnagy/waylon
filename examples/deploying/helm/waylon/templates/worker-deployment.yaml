@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  labels:
+    app.kubernetes.io/name: worker
+    app.kubernetes.io/component: worker
+    {{- include "waylon.commonLabels" . | nindent 4 }}
+    {{- with .Values.worker.deployment.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- if .Values.worker.deployment.annotations }}
+  annotations:
+    {{- toYaml .Values.worker.deployment.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.worker.deployment.replicas }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: {{ .Values.worker.deployment.maxSurge }}
+      maxUnavailable: {{ .Values.worker.deployment.maxUnavailable }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: worker
+      {{- include "waylon.commonLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: worker
+        app.kubernetes.io/component: worker
+        {{- include "waylon.commonLabels" . | nindent 8 }}
+    spec:
+      {{- if .Values.common.strictSecurity }}
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+      {{- end }}
+      {{- if .Values.common.imagePullSecret }}
+      imagePullSecrets:
+      - name: {{ .Values.common.imagePullSecret }}
+      {{- end }}
+      volumes:
+      - name: tmpvol
+        emptyDir: {}
+      containers:
+      - name: worker
+        image: {{ .Values.common.waylonImage }}
+        imagePullPolicy: {{ .Values.worker.deployment.imagePullPolicy }}
+        stdin: true
+        tty: true
+        args: ["worker"]
+        env:
+        - name: REDIS
+          value: {{ .Values.redis.hostAndPort }}
+        - name: LOG_LEVEL
+          value: {{ .Values.worker.deployment.logLevel }}
+        - name: QUEUE
+          value: "senses,skills"
+        envFrom:
+        - secretRef:
+            name: waylon-secret
+        resources:
+          limits:
+            memory: {{ .Values.worker.deployment.memoryLimit }}
+            cpu: {{ .Values.worker.deployment.cpuLimit }}
+          requests:
+            memory: 64Mi
+            cpu: 20m
+        livenessProbe:
+          tcpSocket:
+            port: waylon
+          timeoutSeconds: 2
+          initialDelaySeconds: 2
+          periodSeconds: 2
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: waylon
+          timeoutSeconds: 6
+          initialDelaySeconds: 2
+          periodSeconds: 10
+          failureThreshold: 3
+        ports:
+        - name: waylon
+          containerPort: 9292
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmpvol
+        {{- if .Values.common.strictSecurity }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          privileged: false
+          runAsNonRoot: true
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - all
+        {{- end }}

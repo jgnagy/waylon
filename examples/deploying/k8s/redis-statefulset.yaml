@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  labels:
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/component: redis
+    app.kubernetes.io/part-of: waylon
+spec:
+  serviceName: redis
+  # set to 1 because we're not configuring clustering
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: redis
+      app.kubernetes.io/component: redis
+      app.kubernetes.io/part-of: waylon
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: redis
+        app.kubernetes.io/component: redis
+        app.kubernetes.io/part-of: waylon
+    spec:
+      containers:
+      - name: redis
+        image: redis:6-alpine
+        imagePullPolicy: Always
+        stdin: true
+        tty: true
+        command: 
+        - redis-server
+        - --appendonly yes
+        securityContext:
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          privileged: false
+          runAsNonRoot: true
+          runAsUser: 999
+          runAsGroup: 999
+          capabilities:
+            drop:
+            - ALL
+        resources:
+          limits:
+            memory: 512Mi
+            cpu: 200m
+          requests:
+            memory: 8Mi
+            cpu: 20m
+        ports:
+        - containerPort: 6379
+          protocol: TCP
+          name: redis
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - "/usr/local/bin/redis-cli -h $(hostname) ping"
+          initialDelaySeconds: 15
+          timeoutSeconds: 5
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - "/usr/local/bin/redis-cli -h $(hostname) ping"
+          initialDelaySeconds: 30
+          periodSeconds: 2
+          successThreshold: 1
+          failureThreshold: 3
+          timeoutSeconds: 5
+        volumeMounts:
+        - name: datadir
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+    spec:
+      accessModes:
+      - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: "longhorn"

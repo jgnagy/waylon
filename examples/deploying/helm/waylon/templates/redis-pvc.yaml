@@ -1,0 +1,18 @@
+{{- if and .Values.redis.enabled .Values.redis.storage.hostPath }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/name: redis-data-pvc
+    app.kubernetes.io/component: redis-data-pvc
+    {{- include "waylon.commonLabels" . | nindent 4 }}
+  name: redis-data-pvc
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.redis.storage.capacity }}
+  volumeName: redis-data-pv
+{{- end -}}
