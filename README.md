@@ -34,6 +34,61 @@ Many of these features would be difficult to port to existing frameworks.
 
 ## Getting Started
 
+### Creating A New Skill
+
+Waylon's abilities, usually for responding to input (things like replying to a chat message or responding to a webhook) are packaged in plugins called `Skills`. These Skills use what are called `Routes` to determine what to do with input (and whether or not input can be handled by a particular Skill).
+
+In most cases, a route needs to be defined that matches some text. Waylon supports [Regular Expressions](https://www.rubyguides.com/2015/06/ruby-regex/) to perform this matching, though other forms of `Conditions` can easily be implemented (we'll save that for another time).
+
+Finally, we'll need to define an _action_ that is performed when input matches a Route. This is usually just a standard method in Ruby.
+
+Let's start with a very basic example. We can create a Skill that allows Waylon to perform simple a simple "echo" function, meaning Waylon will just reply with whatever we tell him to.
+
+Install the `waylon` gem:
+
+    $ gem install waylon
+
+Then, create a new skill gem:
+
+    $ waylon skill echo
+
+This will create a gem for you in a directory called `waylon-echo`. You'll need to edit `waylon-echo/waylon-echo.gemspec` and fill in a few important details.
+
+First, find any line containing `TODO` and fill in actual values. Remove `spec.metadata["allowed_push_host"]` unless you have your own private gem server. Remove any other `spec.metadata` lines you don't need.
+
+Toward the end of the file (but before the final `end`), add a line like this:
+
+    spec.add_dependency "waylon-core", "~> 0.1"
+
+Now you should be able to start development. Take a look at `lib/waylon/skills/echo.rb`. Delete the `route()` at the beginning of the file and replace it with this:
+
+    route(/^say\s+(.+)/, :do_the_thing)
+
+This simple route will look for text beginning with "say" and capture any words after it. This captured content will be available in `tokens[1]` (or `tokens.last`).
+
+Now, we can use this to respond. Edit the `do_the_thing` method so it looks like this:
+
+    def do_the_thing
+      react :speech_balloon
+    
+      reply "echo: #{tokens.last}"
+    end
+
+That's it! Save the file and now you have an echo plugin. You can even demo it with:
+
+    $ bundle exec rake demo
+
+You'll be presented with a REPL interface. You can type `say something` and you should get a response back from Waylon that looks something like this:
+
+    (@homer) << say something
+    (@waylon) >> :speech_balloon:
+    echo: 'something'
+
+From here, you'll want to do all the typical ruby things like writing tests, updating the README.md, etc., but that's the easy stuff.
+
+To actually use this with a real chat platform, you'll need to build and release your new gem. This is beyond the scope of this short guide, but [RubyGems.org](https://rubygems.org/) has a great [guide for publishing a gem](https://guides.rubygems.org/publishing/) that is worth reading.
+
+After you've published your gem, you can use it in your own bot. Keep reading to see how that works!
 ### Creating Your Own Bot
 
 To create a new bot using the Waylon bot framework, you can install the `waylon` gem:

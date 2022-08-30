@@ -8,7 +8,7 @@ logger.level = Logger::INFO
 action = ARGV[0]
 
 def validate_project_name(name)
-  name.downcase =~ /^[a-z][a-z0-9_]+$/
+  name.downcase =~ /^[a-z][a-z0-9_-]+$/
 end
 
 def rubocop_template
@@ -55,7 +55,7 @@ def dockerfile_template
   TEMPLATE
 end
 
-def gemfile_template
+def bot_gemfile_template
   <<~TEMPLATE
     # frozen_string_literal: true
 
@@ -70,7 +70,7 @@ def gemfile_template
   TEMPLATE
 end
 
-def rakefile_template
+def bot_rakefile_template
   <<~TEMPLATE
     # frozen_string_literal: true
 
@@ -87,6 +87,85 @@ def rakefile_template
       end
       Resque.redis = ENV.fetch("REDIS", "localhost:6379")
       Resque.logger = Waylon::Logger.logger
+    end
+  TEMPLATE
+end
+
+def skill_rakefile_template
+  <<~TEMPLATE
+    # frozen_string_literal: true
+
+    require "bundler/gem_tasks"
+    require "rspec/core/rake_task"
+    require "rubocop/rake_task"
+    require "redis/errors"
+    require "resque/tasks"
+    require "yard"
+    require "waylon/core"
+
+    RSpec::Core::RakeTask.new(:spec)
+    RuboCop::RakeTask.new
+    YARD::Rake::YardocTask.new do |y|
+      y.options = [
+        "--markup", "markdown"
+      ]
+    end
+
+    task default: %i[spec rubocop yard]
+
+    task :demo do
+      require_relative "lib/waylon/skills/#{@project_name}"
+      Waylon::Logger.logger = ::Logger.new("/dev/null")
+      Waylon::Cache.storage = Moneta.new(:Cookie)
+      Waylon::Storage.storage = Moneta.new(:Cookie)
+      require "waylon/rspec/test_server"
+    end
+  TEMPLATE
+end
+
+def skill_skeleton_template
+  <<~TEMPLATE
+    # frozen_string_literal: true
+
+    module Waylon
+      module Skills
+        # A Waylon Skill
+        class #{@project_name.capitalize} < Waylon::Skill
+          route(
+            /#{@project_name}/i,
+            :do_the_thing,
+            help: {
+              usage: "FILL IN HOW TO USE THIS",
+              description: "EXPLAIN WHAT THIS DOES"
+            },
+            mention_only: true # this means your message must mention Waylon
+          )
+
+          def do_the_thing
+            # TODO: Fill this in...
+
+            # Some example capabilities:
+            #
+            #   react :wave
+            #
+            # That will react to a chat message, assuming the Sense supports reactions
+
+            # If you need access to the message, use this:
+            #
+            #   tokens
+            #
+            # It provides an Array, with `tokens[0]` being the entire message
+
+            # To send a message back, use:
+            #
+            #   reply "some message"
+            #
+            # You could also reply in a thread:
+            #
+            #   threaded_reply "this is a response in a thread!"
+          end
+        end
+      end
     end
   TEMPLATE
 end
@@ -144,15 +223,24 @@ def plugins_rb_template
   TEMPLATE
 end
 
-def template_mapping
+def bot_template_mapping
   {
-    config_ru_template: "config.rb",
+    config_ru_template: "config.ru",
     dockerfile_template: "Dockerfile",
     gemfile_template: "Gemfile",
     plugins_rb_template: "plugins.rb",
-    rakefile_template: "Rakefile",
+    bot_rakefile_template: "Rakefile",
     rubocop_template: ".rubocop.yml",
     ruby_version_template: ".ruby-version"
+  }
+end
+
+def skill_template_mapping(project_name)
+  {
+    skill_rakefile_template: "Rakefile",
+    rubocop_template: ".rubocop.yml",
+    ruby_version_template: ".ruby-version",
+    skill_skeleton_template: "lib/waylon/skills/#{project_name}.rb"
   }
 end
 
@@ -172,8 +260,33 @@ when "init"
   logger.info "Initializing new Waylon bot project '#{project_name}'..."
   system("git init #{project_name}")
   Dir.chdir(project_name) do
-    template_mapping.each do |func, file|
+    bot_template_mapping.each do |func, file|
       logger.info "Rendering #{File.expand_path(File.join(project_name, file))}"
+      File.write(file, send(func))
+    end
+  end
+  logger.info "Done!"
+when "skill"
+  project_name = ARGV[1]
+  unless project_name
+    logger.fatal "Missing Project Name for new Skill plugin!"
+    exit 1
+  end
+
+  unless validate_project_name(project_name)
+    logger.fatal "Invalid Skill Name: #{project_name}"
+    exit 2
+  end
+
+  gem_name = project_name.start_with?("waylon-") ? project_name : "waylon-#{project_name}"
+  @project_name = project_name # for rendering templates
+
+  logger.info "Initializing new Waylon Skill plugin '#{gem_name}'..."
+  system("bundle gem --test=rspec --no-exe #{gem_name}")
+  Dir.chdir(gem_name) do
+    FileUtils.mkdir_p("lib/waylon/skills")
+    skill_template_mapping(project_name).each do |func, file|
+      logger.info "Rendering #{File.expand_path(File.join(gem_name, file))}"
       File.write(file, send(func))
     end
   end
