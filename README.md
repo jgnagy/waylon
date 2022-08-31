@@ -63,6 +63,7 @@ Toward the end of the file (but before the final `end`), add a line like this:
 You'll also need to add a few development dependencies:
 
     spec.add_development_dependency "pry"
+    spec.add_development_dependency "rubocop"
     spec.add_development_dependency "yard"
 
 Now install all the dependencies:
