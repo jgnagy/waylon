@@ -65,6 +65,10 @@ You'll also need to add a few development dependencies:
     spec.add_development_dependency "pry"
     spec.add_development_dependency "yard"
 
+Now install all the dependencies:
+
+    bundle install
+
 Now you should be able to start development. Take a look at `lib/waylon/skills/echo.rb`. Delete the `route()` at the beginning of the file and replace it with this:
 
     route(/^say\s+(.+)/, :do_the_thing)
