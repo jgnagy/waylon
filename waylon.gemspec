@@ -2,7 +2,7 @@
 
 module Waylon
   # Update this to match the desired Waylon::Core::VERSION to release
-  VERSION = "0.2.2"
+  VERSION = "0.2.4"
 end
 
 Gem::Specification.new do |spec|

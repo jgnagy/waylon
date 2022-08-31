@@ -58,13 +58,18 @@ First, find any line containing `TODO` and fill in actual values. Remove `spec.m
 
 Toward the end of the file (but before the final `end`), add a line like this:
 
-    spec.add_dependency "waylon-core", "~> 0.1"
+    spec.add_dependency "waylon-core", "~> 0.2"
+
+You'll also need to add a few development dependencies:
+
+    spec.add_development_dependency "pry"
+    spec.add_development_dependency "yard"
 
 Now you should be able to start development. Take a look at `lib/waylon/skills/echo.rb`. Delete the `route()` at the beginning of the file and replace it with this:
 
     route(/^say\s+(.+)/, :do_the_thing)
 
-This simple route will look for text beginning with "say" and capture any words after it. This captured content will be available in `tokens[1]` (or `tokens.last`).
+This simple route will look for text beginning with "say" and capture any words after it. This captured content will be available in `tokens[0]` (or `tokens.last`).
 
 Now, we can use this to respond. Edit the `do_the_thing` method so it looks like this:
 

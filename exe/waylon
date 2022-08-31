@@ -114,6 +114,7 @@ def skill_rakefile_template
     task default: %i[spec rubocop yard]
 
     task :demo do
+      require "pry"
       require_relative "lib/waylon/skills/#{@project_name}"
       Waylon::Logger.logger = ::Logger.new("/dev/null")
       Waylon::Cache.storage = Moneta.new(:Cookie)
@@ -154,7 +155,7 @@ def skill_skeleton_template
             #
             #   tokens
             #
-            # It provides an Array, with `tokens[0]` being the entire message
+            # It provides an Array of captures content
 
             # To send a message back, use:
             #
