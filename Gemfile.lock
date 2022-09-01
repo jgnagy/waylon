@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    waylon (0.2.5)
+    waylon (0.2.6)
       rake (~> 13.0)
       waylon-core
 
@@ -73,7 +73,7 @@ GEM
     rake (13.0.6)
     rbnacl (7.1.1)
       ffi
-    redis (5.0.1)
+    redis (5.0.2)
       redis-client (~> 0.7)
     redis-client (0.7.1)
       connection_pool
@@ -148,7 +148,7 @@ GEM
     thor (1.2.1)
     tilt (2.0.11)
     unicode-display_width (2.2.0)
-    waylon-core (0.2.5)
+    waylon-core (0.2.6)
       addressable (~> 2.8)
       faraday (~> 1.8)
       i18n (~> 1.8)

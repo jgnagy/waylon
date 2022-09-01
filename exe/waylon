@@ -228,7 +228,7 @@ def bot_template_mapping
   {
     config_ru_template: "config.ru",
     dockerfile_template: "Dockerfile",
-    gemfile_template: "Gemfile",
+    bot_gemfile_template: "Gemfile",
     plugins_rb_template: "plugins.rb",
     bot_rakefile_template: "Rakefile",
     rubocop_template: ".rubocop.yml",
