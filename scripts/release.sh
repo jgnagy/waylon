@@ -1,6 +1,6 @@
 #!/bin/sh
 
-gem install bundler -v '~> 2.3'
+gem install bundler -v '~> 2.4'
 bundle install
 rm -rf pkg/*.gem
 bundle exec rake build
