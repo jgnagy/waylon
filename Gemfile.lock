@@ -164,7 +164,7 @@ GEM
       puma (~> 6.4)
       rbnacl (~> 7.1)
       resque (~> 2.2)
-    yard (0.9.34)
+    yard (0.9.44)
 
 PLATFORMS
   aarch64-linux
