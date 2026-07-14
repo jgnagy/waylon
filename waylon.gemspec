@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.description   = "Wrapper gem to ease the installation of the Waylon Bot Framework"
   spec.homepage      = "https://github.com/jgnagy/waylon"
   spec.license       = "MIT"
-  spec.required_ruby_version = "~> 3.2"
+  spec.required_ruby_version = ">= 3.4"
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/jgnagy/waylon"
@@ -34,10 +34,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency "waylon-core"
 
   spec.add_development_dependency "bundler", "~> 2.3"
-  spec.add_development_dependency "rspec", "~> 3.10"
-  spec.add_development_dependency "rubocop", "~> 1.23"
+  spec.add_development_dependency "rspec", "~> 3.13"
+  spec.add_development_dependency "rubocop", "~> 1.7"
   spec.add_development_dependency "rubocop-rake", "~> 0.6"
-  spec.add_development_dependency "rubocop-rspec", "~> 2.6"
+  spec.add_development_dependency "rubocop-rspec", "~> 3.0"
   spec.add_development_dependency "simplecov", "~> 1.0"
   spec.add_development_dependency "solargraph", "~> 0.45"
   spec.add_development_dependency "yard", "~> 0.9", ">= 0.9.27"
