@@ -224,7 +224,7 @@ GEM
       puma (~> 6.4)
       rbnacl (~> 7.1)
       resque (~> 2.2)
-    yard (0.9.44)
+    yard (0.9.45)
     yard-activesupport-concern (0.0.1)
       yard (>= 0.8)
     yard-solargraph (0.1.0)
@@ -240,7 +240,7 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 2.3)
   rake (~> 13.0)
-  rspec (~> 3.0)
+  rspec (~> 3.13, ~> 3.0)
   rubocop (~> 1.7)
   rubocop-rake (~> 0.6)
   rubocop-rspec (~> 3.0)
